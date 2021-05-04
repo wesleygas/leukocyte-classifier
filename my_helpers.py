@@ -140,7 +140,7 @@ def eosinofilo_area_ratio(img):
     eosi_tresh = np.array([[152,34,113],[165,115,241]])
     eothresh = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
     eothresh = cv2.inRange(eothresh,np.array(eosi_tresh[0]),np.array(eosi_tresh[1]))
-    cv2.imshow("eosi",eothresh)
+    # cv2.imshow("eosi",eothresh)
     area_rosa = np.sum(eothresh/255)
     area_total = np.prod(eothresh.shape)
     return area_rosa/area_total # > 0.02
@@ -181,6 +181,8 @@ def cluster_props(props):
     print(clusters)
     return clusters
 
+#On hold pq ninguém merece implementar clusterização só pra isso
+# KKK mentira, eu mereço sim 
 def separate_cells(o_img, contours):
     img = o_img.copy()
     size = img.shape[:2][::-1]
@@ -272,7 +274,7 @@ def find_nucleus_intersection(img):
     intersect = cv2.dilate(nucleus,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5)),iterations=3)
     # show_step(intersect, "dilated")
     intersect = (cyto&intersect)&(~nucleus)
-    cv2.imshow("dilated",intersect)
+    # cv2.imshow("dilated",intersect)
     ratio = np.sum(intersect|nucleus)/(np.sum(nucleus))
     # print(f"Ratio: {ratio}") #IT WEEEERKS
     # if(ratio < 1.29):
@@ -301,6 +303,17 @@ def extract_nuclei(img):
 
 
 # ----- Visualização ---------
+def draw_result(img, bbox, escolha):
+    #Desenha em cima ou embaixo da caixa?
+    y_max= img.shape[:2][::-1][1]
+    bb_min = bbox[0]
+    bb_max = bbox[1]
+    # Tem espaço pra escrever em cima
+    org = bb_min
+    if(bb_min[1] < 32):
+        org = (bb_min[0],bb_max[1]-32)
+    cv2.putText(img,escolha[2:],org,cv2.FONT_HERSHEY_SIMPLEX,1,(240,50,100),thickness=3)
+
 
 def mouseRGB(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #checks mouse left button down condition
